@@ -3,14 +3,14 @@ import model.*;
 import java.util.*;
 
 public class Main {
-    private static final String ADMIN_PASSWORD = "admin123"; // Change as needed
+    private static final String ADMIN_PASSWORD = "admin123";
 
     private static void printProductTable(List<Product> products) {
-        System.out.println("+-----+----------------------+-------------+");
-        System.out.println("| ID  | Product Name         | Price       |");
-        System.out.println("+-----+----------------------+-------------+");
+        System.out.println("+-----+----------------------+-------------+----------+");
+        System.out.println("| ID  | Product Name         | Price       | Stock    |");
+        System.out.println("+-----+----------------------+-------------+----------+");
         products.forEach(p -> System.out.println(p));
-        System.out.println("+-----+----------------------+-------------+");
+        System.out.println("+-----+----------------------+-------------+----------+");
     }
 
     private static void simulateProgressBar() {
@@ -83,17 +83,17 @@ public class Main {
         List<Product> products = new ArrayList<>();
         Queue<Customer> checkoutQueue = new LinkedList<>();
 
-        // Preloaded products
-        products.add(new Product(1, "Laptop", 99999.99));
-        products.add(new Product(2, "Phone", 49949.00));
-        products.add(new Product(3, "Headphones", 7999.99));
-        products.add(new Product(4, "Book", 1299.00));
-        products.add(new Product(5, "Tablet", 29999.00));
-        products.add(new Product(6, "Smartwatch", 15999.50));
-        products.add(new Product(7, "Backpack", 2499.99));
-        products.add(new Product(8, "Charger", 899.00));
-        products.add(new Product(9, "Pen Drive", 499.99));
-        products.add(new Product(10, "Bluetooth Speaker", 3499.75));
+        // Preloaded products with stock
+        products.add(new Product(1, "Laptop", 99999.99, 10));
+        products.add(new Product(2, "Phone", 49949.00, 15));
+        products.add(new Product(3, "Headphones", 7999.99, 20));
+        products.add(new Product(4, "Book", 1299.00, 30));
+        products.add(new Product(5, "Tablet", 29999.00, 5));
+        products.add(new Product(6, "Smartwatch", 15999.50, 8));
+        products.add(new Product(7, "Backpack", 2499.99, 12));
+        products.add(new Product(8, "Charger", 899.00, 25));
+        products.add(new Product(9, "Pen Drive", 499.99, 50));
+        products.add(new Product(10, "Bluetooth Speaker", 3499.75, 18));
 
         // Role-based authentication
         System.out.print("Are you an admin? (y/n): ");
@@ -154,7 +154,8 @@ public class Main {
                         System.out.print("Enter product name: ");
                         String prodName = scanner.nextLine();
                         double prodPrice = validatePriceInput(scanner);
-                        products.add(new Product(products.size() + 1, prodName, prodPrice));
+                        int stock = validateIntegerInput(scanner, "Enter stock quantity: ", 0, 1000);
+                        products.add(new Product(products.size() + 1, prodName, prodPrice, stock));
                         System.out.println("Product added successfully!");
                         break;
                     case 10:
@@ -198,7 +199,8 @@ public class Main {
                                 "Enter product ID to add: ", 1, products.size());
                         int quantity = validateIntegerInput(scanner,
                                 "Enter quantity: ", 1, 100);
-                        customer.getCart().addProduct(products.get(addId - 1), quantity);
+                        Product selectedProduct = products.get(addId - 1);
+                        customer.getCart().addProduct(selectedProduct, quantity);
                         break;
                     case 4:
                         customer.getCart().viewCart();
@@ -206,7 +208,8 @@ public class Main {
                     case 5:
                         int removeId = validateIntegerInput(scanner,
                                 "Enter product ID to remove: ", 1, products.size());
-                        customer.getCart().removeProduct(products.get(removeId - 1));
+                        Product removeProduct = products.get(removeId - 1);
+                        customer.getCart().removeProduct(removeProduct);
                         break;
                     case 6:
                         customer.getCart().viewCart();

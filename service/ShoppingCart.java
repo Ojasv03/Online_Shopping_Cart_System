@@ -7,14 +7,22 @@ public class ShoppingCart {
     private Map<Product, Integer> cartItems = new HashMap<>();
 
     public void addProduct(Product product, int quantity) {
-        cartItems.put(product, cartItems.getOrDefault(product, 0) + quantity);
-        System.out.printf("%d x %s added to cart.%n", quantity, product.getName());
+        if (product.getStock() >= quantity) {
+            cartItems.put(product, cartItems.getOrDefault(product, 0) + quantity);
+            product.setStock(product.getStock() - quantity);
+            System.out.printf("%d x %s added to cart.%n", quantity, product.getName());
+        } else {
+            System.out.printf("Error: Only %d units of %s available.%n", 
+                product.getStock(), product.getName());
+        }
     }
 
     public void removeProduct(Product product) {
         if (cartItems.containsKey(product)) {
+            int quantity = cartItems.get(product);
+            product.setStock(product.getStock() + quantity);
             cartItems.remove(product);
-            System.out.println(product.getName() + " removed from cart.");
+            System.out.println(product.getName() + " removed. Stock updated.");
         } else {
             System.out.println("Product not found in cart.");
         }
