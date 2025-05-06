@@ -69,7 +69,7 @@ public class Main {
         System.out.println("\n--- Customer Menu ---");
         System.out.println("0. Show Menu");
         System.out.println("1. View Products");
-        System.out.println("2. Sort Products");
+        System.out.println("2. Filter Products");
         System.out.println("3. Add to Cart");
         System.out.println("4. View Cart");
         System.out.println("5. Remove from Cart");
@@ -186,13 +186,13 @@ public class Main {
                         break;
                     case 2:
                         int sortChoice = validateIntegerInput(scanner,
-                                "Sort by: 1. Name  2. Price\nEnter choice: ", 1, 2);
+                                "Filter by: 1. Name  2. Price\nEnter choice: ", 1, 2);
                         if (sortChoice == 1) {
                             products.sort(Comparator.comparing(Product::getName));
                         } else {
                             products.sort(Comparator.comparingDouble(Product::getPrice));
                         }
-                        System.out.println("Product list sorted.");
+                        System.out.println("Filtered list sorted.");
                         break;
                     case 3:
                         int addId = validateIntegerInput(scanner,
