@@ -3,6 +3,7 @@ import model.*;
 import java.util.*;
 
 public class Main {
+    private static final String ADMIN_PASSWORD = "admin123"; // Change as needed
 
     private static void printProductTable(List<Product> products) {
         System.out.println("+-----+----------------------+-------------+");
@@ -18,7 +19,7 @@ public class Main {
         for (int i = 0; i < width; i++) {
             System.out.print("=");
             try {
-                Thread.sleep(30); // Faster animation for snappier UX
+                Thread.sleep(30);
             } catch (InterruptedException e) {}
         }
         System.out.println("]");
@@ -55,6 +56,28 @@ public class Main {
         }
     }
 
+    private static void displayAdminMenu() {
+        System.out.println("\n--- Admin Menu ---");
+        System.out.println("0. Show Menu");
+        System.out.println("1. View Products");
+        System.out.println("8. Add Product");
+        System.out.println("10. Process Checkout Queue");
+        System.out.println("7. Exit");
+    }
+
+    private static void displayCustomerMenu() {
+        System.out.println("\n--- Customer Menu ---");
+        System.out.println("0. Show Menu");
+        System.out.println("1. View Products");
+        System.out.println("2. Sort Products");
+        System.out.println("3. Add to Cart");
+        System.out.println("4. View Cart");
+        System.out.println("5. Remove from Cart");
+        System.out.println("6. Checkout");
+        System.out.println("7. Exit");
+        System.out.println("9. Enter Checkout Queue");
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<Product> products = new ArrayList<>();
@@ -72,25 +95,43 @@ public class Main {
         products.add(new Product(9, "Pen Drive", 499.99));
         products.add(new Product(10, "Bluetooth Speaker", 3499.75));
 
-        System.out.print("Enter your name: ");
-        Customer customer = new Customer(scanner.nextLine());
-        customer.greet();
+        // Role-based authentication
+        System.out.print("Are you an admin? (y/n): ");
+        String roleInput = scanner.nextLine().trim().toLowerCase();
+        boolean isAdmin = roleInput.equals("y");
+        boolean isCustomer = !isAdmin;
 
-        // Display menu once at startup
-        System.out.println("\n--- Shopping Cart Menu ---");
-        System.out.println("0. Show Menu");
-        System.out.println("1. View Products");
-        System.out.println("2. Sort Products");
-        System.out.println("3. Add to Cart");
-        System.out.println("4. View Cart");
-        System.out.println("5. Remove from Cart");
-        System.out.println("6. Checkout");
-        System.out.println("7. Exit");
-        System.out.println("8. Add Product (Admin)");
-        System.out.println("9. Enter Checkout Queue");
-        System.out.println("10. Process Checkout Queue (Admin)");
+        String userName = "Admin";
+        Customer customer = null;
 
-        while (true) {
+        if (isAdmin) {
+            System.out.print("Enter admin password: ");
+            String password = scanner.nextLine();
+            if (!ADMIN_PASSWORD.equals(password)) {
+                System.out.println("Incorrect password! Switching to customer mode.");
+                isAdmin = false;
+                isCustomer = true;
+            }
+        }
+
+        if (isCustomer) {
+            System.out.print("Enter your name: ");
+            userName = scanner.nextLine();
+            customer = new Customer(userName);
+            customer.greet();
+        } else {
+            System.out.println("Welcome, Admin!");
+        }
+
+        // Display menu ONCE before loop
+        if (isAdmin) {
+            displayAdminMenu();
+        } else {
+            displayCustomerMenu();
+        }
+
+        boolean running = true;
+        while (running) {
             System.out.print("\nEnter choice: ");
             int choice;
             try {
@@ -100,98 +141,95 @@ public class Main {
                 continue;
             }
 
-            switch (choice) {
-                case 0: // Redisplay menu
-                    System.out.println("\n--- Shopping Cart Menu ---");
-                    System.out.println("0. Show Menu");
-                    System.out.println("1. View Products");
-                    System.out.println("2. Sort Products");
-                    System.out.println("3. Add to Cart");
-                    System.out.println("4. View Cart");
-                    System.out.println("5. Remove from Cart");
-                    System.out.println("6. Checkout");
-                    System.out.println("7. Exit");
-                    System.out.println("8. Add Product (Admin)");
-                    System.out.println("9. Enter Checkout Queue");
-                    System.out.println("10. Process Checkout Queue (Admin)");
-                    break;
-
-                case 1:
-                    System.out.println("\n--- Product List ---");
-                    printProductTable(products);
-                    break;
-
-                case 2:
-                    int sortChoice = validateIntegerInput(scanner,
-                            "Sort by: 1. Name  2. Price\nEnter choice: ", 1, 2);
-                    if (sortChoice == 1) {
-                        products.sort(Comparator.comparing(Product::getName));
-                    } else {
-                        products.sort(Comparator.comparingDouble(Product::getPrice));
-                    }
-                    System.out.println("Product list sorted.");
-                    break;
-
-                case 3:
-                    int addId = validateIntegerInput(scanner,
-                            "Enter product ID to add: ", 1, products.size());
-                    int quantity = validateIntegerInput(scanner,
-                            "Enter quantity: ", 1, 100);
-                    customer.getCart().addProduct(products.get(addId - 1), quantity);
-                    break;
-
-                case 4:
-                    customer.getCart().viewCart();
-                    break;
-
-                case 5:
-                    int removeId = validateIntegerInput(scanner,
-                            "Enter product ID to remove: ", 1, products.size());
-                    customer.getCart().removeProduct(products.get(removeId - 1));
-                    break;
-
-                case 6:
-                    customer.getCart().viewCart();
-                    int confirm = validateIntegerInput(scanner,
-                            "Confirm checkout? (1=Yes, 0=No): ", 0, 1);
-                    if (confirm == 1) {
-                        simulateProgressBar();
-                        customer.getCart().checkout();
-                    }
-                    break;
-
-                case 7:
-                    System.out.println("Goodbye, " + customer.getName() + "!");
-                    scanner.close();
-                    return;
-
-                case 8:
-                    System.out.print("Enter product name: ");
-                    String prodName = scanner.nextLine();
-                    double prodPrice = validatePriceInput(scanner);
-                    products.add(new Product(products.size() + 1, prodName, prodPrice));
-                    System.out.println("Product added successfully!");
-                    break;
-
-                case 9:
-                    checkoutQueue.add(customer);
-                    System.out.println(customer.getName() + " added to checkout queue.");
-                    break;
-
-                case 10:
-                    if (checkoutQueue.isEmpty()) {
-                        System.out.println("No customers in queue.");
-                    } else {
-                        Customer nextCustomer = checkoutQueue.poll();
-                        System.out.println("Processing checkout for: " + nextCustomer.getName());
-                        simulateProgressBar();
-                        nextCustomer.getCart().checkout();
-                    }
-                    break;
-
-                default:
-                    System.out.println("Invalid choice. (Enter 0 to see menu)");
+            if (isAdmin) {
+                switch (choice) {
+                    case 0:
+                        displayAdminMenu();
+                        break;
+                    case 1:
+                        System.out.println("\n--- Product List ---");
+                        printProductTable(products);
+                        break;
+                    case 8:
+                        System.out.print("Enter product name: ");
+                        String prodName = scanner.nextLine();
+                        double prodPrice = validatePriceInput(scanner);
+                        products.add(new Product(products.size() + 1, prodName, prodPrice));
+                        System.out.println("Product added successfully!");
+                        break;
+                    case 10:
+                        if (checkoutQueue.isEmpty()) {
+                            System.out.println("No customers in queue.");
+                        } else {
+                            Customer nextCustomer = checkoutQueue.poll();
+                            System.out.println("Processing checkout for: " + nextCustomer.getName());
+                            simulateProgressBar();
+                            nextCustomer.getCart().checkout();
+                        }
+                        break;
+                    case 7:
+                        System.out.println("Goodbye, Admin!");
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid choice. (Enter 0 to see menu)");
+                }
+            } else { // Customer
+                switch (choice) {
+                    case 0:
+                        displayCustomerMenu();
+                        break;
+                    case 1:
+                        System.out.println("\n--- Product List ---");
+                        printProductTable(products);
+                        break;
+                    case 2:
+                        int sortChoice = validateIntegerInput(scanner,
+                                "Sort by: 1. Name  2. Price\nEnter choice: ", 1, 2);
+                        if (sortChoice == 1) {
+                            products.sort(Comparator.comparing(Product::getName));
+                        } else {
+                            products.sort(Comparator.comparingDouble(Product::getPrice));
+                        }
+                        System.out.println("Product list sorted.");
+                        break;
+                    case 3:
+                        int addId = validateIntegerInput(scanner,
+                                "Enter product ID to add: ", 1, products.size());
+                        int quantity = validateIntegerInput(scanner,
+                                "Enter quantity: ", 1, 100);
+                        customer.getCart().addProduct(products.get(addId - 1), quantity);
+                        break;
+                    case 4:
+                        customer.getCart().viewCart();
+                        break;
+                    case 5:
+                        int removeId = validateIntegerInput(scanner,
+                                "Enter product ID to remove: ", 1, products.size());
+                        customer.getCart().removeProduct(products.get(removeId - 1));
+                        break;
+                    case 6:
+                        customer.getCart().viewCart();
+                        int confirm = validateIntegerInput(scanner,
+                                "Confirm checkout? (1=Yes, 0=No): ", 0, 1);
+                        if (confirm == 1) {
+                            simulateProgressBar();
+                            customer.getCart().checkout();
+                        }
+                        break;
+                    case 7:
+                        System.out.println("Goodbye, " + customer.getName() + "!");
+                        running = false;
+                        break;
+                    case 9:
+                        checkoutQueue.add(customer);
+                        System.out.println(customer.getName() + " added to checkout queue.");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. (Enter 0 to see menu)");
+                }
             }
         }
+        scanner.close();
     }
 }

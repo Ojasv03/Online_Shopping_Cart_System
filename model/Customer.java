@@ -6,11 +6,10 @@ public class Customer extends User {
     private ShoppingCart cart;
 
     public Customer(String name) {
-        super(name);
+        super(name, Role.CUSTOMER);
         this.cart = new ShoppingCart();
     }
 
-    // Getter for cart
     public ShoppingCart getCart() {
         return cart;
     }
