@@ -1,5 +1,5 @@
 import model.*;
-//import service.ShoppingCart;
+import service.*;
 import java.util.*;
 
 public class Main {
@@ -20,7 +20,8 @@ public class Main {
             System.out.print("=");
             try {
                 Thread.sleep(30);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
         System.out.println("]");
     }
@@ -46,7 +47,8 @@ public class Main {
             try {
                 System.out.print("Enter product price: ");
                 double price = Double.parseDouble(scanner.nextLine());
-                if (price < 0) throw new IllegalArgumentException();
+                if (price < 0)
+                    throw new IllegalArgumentException();
                 return price;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input! Please enter a valid number.");
@@ -59,6 +61,7 @@ public class Main {
     private static void displayAdminMenu() {
         System.out.println("\n--- Admin Menu ---");
         System.out.println("0. Show Menu");
+        System.out.println("1. View Products");
         System.out.println("8. Add Product");
         System.out.println("10. Process Checkout Queue");
         System.out.println("7. Exit");
@@ -68,18 +71,36 @@ public class Main {
         System.out.println("\n--- Customer Menu ---");
         System.out.println("0. Show Menu");
         System.out.println("1. View Products");
-        System.out.println("2. Sort Products");
+        System.out.println("2. Filter Products");
         System.out.println("3. Add to Cart");
         System.out.println("4. View Cart");
         System.out.println("5. Remove from Cart");
         System.out.println("6. Checkout");
         System.out.println("7. Exit");
         System.out.println("9. Enter Checkout Queue");
-        System.out.println("10. Search Product by Name");
+        System.out.println("10. Search Product");
+        System.out.println("11. Wishlist");
+    }
+
+    private static void displayWishlistMenu() {
+        System.out.println("\n--- Wishlist Menu ---");
+        System.out.println("1. View Wishlist");
+        System.out.println("2. Add to Wishlist");
+        System.out.println("3. Remove from Wishlist");
+        System.out.println("4. Back to Customer Menu");
+    }
+
+    private static Product findProductById(List<Product> products, int id) {
+        for (Product p : products) {
+            if (p.getId() == id) {
+                return p;
+            }
+        }
+        return null;
     }
 
     // Manual binary search implementation
-    private static int manualBinarySearchByName(List<Product> products, String targetName) {
+    private static int binarySearchByName(List<Product> products, String targetName) {
         int low = 0;
         int high = products.size() - 1;
         while (low <= high) {
@@ -99,20 +120,23 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        List<Product> products = new ArrayList<>();
+        List<Product> products = ProductController.loadProducts(); // Loading products from file
         Queue<Customer> checkoutQueue = new LinkedList<>();
 
-        // Preloaded products with stock
-        products.add(new Product(1, "Laptop", 99999.99, 10));
-        products.add(new Product(2, "Phone", 49949.00, 15));
-        products.add(new Product(3, "Headphones", 7999.99, 20));
-        products.add(new Product(4, "Book", 1299.00, 30));
-        products.add(new Product(5, "Tablet", 29999.00, 5));
-        products.add(new Product(6, "Smartwatch", 15999.50, 8));
-        products.add(new Product(7, "Backpack", 2499.99, 12));
-        products.add(new Product(8, "Charger", 899.00, 25));
-        products.add(new Product(9, "Pen Drive", 499.99, 50));
-        products.add(new Product(10, "Bluetooth Speaker", 3499.75, 18));
+        // If no products are loaded (file was empty or doesn't exist), preload some
+        // default products
+        if (products.isEmpty()) {
+            products.add(new Product(1, "Laptop", 99999.99, 10));
+            products.add(new Product(2, "Phone", 49949.00, 15));
+            products.add(new Product(3, "Headphones", 7999.99, 20));
+            products.add(new Product(4, "Book", 1299.00, 30));
+            products.add(new Product(5, "Tablet", 29999.00, 5));
+            products.add(new Product(6, "Smartwatch", 15999.50, 8));
+            products.add(new Product(7, "Backpack", 2499.99, 12));
+            products.add(new Product(8, "Charger", 899.00, 25));
+            products.add(new Product(9, "Pen Drive", 499.99, 50));
+            products.add(new Product(10, "Bluetooth Speaker", 3499.75, 18));
+        }
 
         // Role-based authentication
         System.out.print("Are you an admin? (y/n): ");
@@ -136,6 +160,15 @@ public class Main {
         if (isCustomer) {
             System.out.print("Enter your name: ");
             userName = scanner.nextLine();
+
+            // Check if the user exists, if not, register them
+            if (UserController.checkUserExistence(userName)) {
+                System.out.println("Welcome back, " + userName + "!");
+            } else {
+                UserController.registerUser(userName);
+                System.out.println("You have been registered.");
+            }
+
             customer = new Customer(userName);
             customer.greet();
         } else {
@@ -165,12 +198,17 @@ public class Main {
                     case 0:
                         displayAdminMenu();
                         break;
+                    case 1:
+                        System.out.println("\n--- Product List ---");
+                        printProductTable(products);
+                        break;
                     case 8:
                         System.out.print("Enter product name: ");
                         String prodName = scanner.nextLine();
                         double prodPrice = validatePriceInput(scanner);
                         int stock = validateIntegerInput(scanner, "Enter stock quantity: ", 0, 1000);
                         products.add(new Product(products.size() + 1, prodName, prodPrice, stock));
+                        ProductController.saveProducts(products); // Save products to file
                         System.out.println("Product added successfully!");
                         break;
                     case 10:
@@ -201,30 +239,36 @@ public class Main {
                         break;
                     case 2:
                         int sortChoice = validateIntegerInput(scanner,
-                                "Sort by: 1. Name  2. Price\nEnter choice: ", 1, 2);
+                                "Filter by: 1. Name  2. Price\nEnter choice: ", 1, 2);
                         if (sortChoice == 1) {
                             products.sort(Comparator.comparing(Product::getName));
                         } else {
                             products.sort(Comparator.comparingDouble(Product::getPrice));
                         }
-                        System.out.println("Product list sorted.");
+                        System.out.println("Product list filtered.");
                         break;
                     case 3:
-                        int addId = validateIntegerInput(scanner,
-                                "Enter product ID to add: ", 1, products.size());
-                        int quantity = validateIntegerInput(scanner,
-                                "Enter quantity: ", 1, 100);
-                        Product selectedProduct = products.get(addId - 1);
-                        customer.getCart().addProduct(selectedProduct, quantity);
+                        int addId = validateIntegerInput(scanner, "Enter product ID to add: ", 1, products.size());
+                        int quantity = validateIntegerInput(scanner, "Enter quantity: ", 1, 100);
+                        Product selectedProduct = findProductById(products, addId);
+                        if (selectedProduct != null) {
+                            customer.getCart().addProduct(selectedProduct, quantity);
+                        } else {
+                            System.out.println("Product ID not found.");
+                        }
                         break;
                     case 4:
                         customer.getCart().viewCart();
                         break;
                     case 5:
-                        int removeId = validateIntegerInput(scanner,
-                                "Enter product ID to remove: ", 1, products.size());
-                        Product removeProduct = products.get(removeId - 1);
-                        customer.getCart().removeProduct(removeProduct);
+                        int removeId = validateIntegerInput(scanner, "Enter product ID to remove: ", 1,
+                                products.size());
+                        Product removeProduct = findProductById(products, removeId);
+                        if (removeProduct != null) {
+                            customer.getCart().removeProduct(removeProduct);
+                        } else {
+                            System.out.println("Product ID not found.");
+                        }
                         break;
                     case 6:
                         customer.getCart().viewCart();
@@ -248,7 +292,7 @@ public class Main {
                         String searchName = scanner.nextLine();
                         // Ensure list is sorted by name before binary search
                         products.sort(Comparator.comparing(Product::getName));
-                        int index = manualBinarySearchByName(products, searchName);
+                        int index = binarySearchByName(products, searchName);
                         if (index != -1) {
                             System.out.println("Product found:");
                             System.out.println(products.get(index));
@@ -256,6 +300,44 @@ public class Main {
                             System.out.println("Product not found.");
                         }
                         break;
+                    case 11:
+                        boolean wishlistRunning = true;
+                        displayWishlistMenu();
+                        while (wishlistRunning) {
+                            int wishlistChoice = validateIntegerInput(scanner, "Enter wishlist choice: ", 1, 4);
+                            switch (wishlistChoice) {
+                                case 1:
+                                    customer.viewWishlist();
+                                    break;
+                                case 2:
+                                    int addWishId = validateIntegerInput(scanner,
+                                            "Enter product ID to add to wishlist: ", 1, products.size());
+                                    Product wishAddProduct = findProductById(products, addWishId);
+                                    if (wishAddProduct != null) {
+                                        customer.addToWishlist(wishAddProduct);
+                                    } else {
+                                        System.out.println("Product ID not found.");
+                                    }
+                                    break;
+                                case 3:
+                                    int removeWishId = validateIntegerInput(scanner,
+                                            "Enter product ID to remove from wishlist: ", 1, products.size());
+                                    Product wishRemoveProduct = findProductById(products, removeWishId);
+                                    if (wishRemoveProduct != null) {
+                                        customer.removeFromWishlist(wishRemoveProduct);
+                                    } else {
+                                        System.out.println("Product ID not found.");
+                                    }
+                                    break;
+                                case 4:
+                                    wishlistRunning = false;
+                                    break;
+                                default:
+                                    System.out.println("Invalid choice. Please try again.");
+                            }
+                        }
+                        break;
+
                     default:
                         System.out.println("Invalid choice. (Enter 0 to see menu)");
                 }
