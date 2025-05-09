@@ -59,7 +59,6 @@ public class Main {
     private static void displayAdminMenu() {
         System.out.println("\n--- Admin Menu ---");
         System.out.println("0. Show Menu");
-        System.out.println("1. View Products");
         System.out.println("8. Add Product");
         System.out.println("10. Process Checkout Queue");
         System.out.println("7. Exit");
@@ -69,13 +68,33 @@ public class Main {
         System.out.println("\n--- Customer Menu ---");
         System.out.println("0. Show Menu");
         System.out.println("1. View Products");
-        System.out.println("2. Filter Products");
+        System.out.println("2. Sort Products");
         System.out.println("3. Add to Cart");
         System.out.println("4. View Cart");
         System.out.println("5. Remove from Cart");
         System.out.println("6. Checkout");
         System.out.println("7. Exit");
         System.out.println("9. Enter Checkout Queue");
+        System.out.println("10. Search Product by Name");
+    }
+
+    // Manual binary search implementation
+    private static int manualBinarySearchByName(List<Product> products, String targetName) {
+        int low = 0;
+        int high = products.size() - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            String midName = products.get(mid).getName();
+            int cmp = midName.compareTo(targetName);
+            if (cmp == 0) {
+                return mid;
+            } else if (cmp < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return -1; // Not found
     }
 
     public static void main(String[] args) {
@@ -146,10 +165,6 @@ public class Main {
                     case 0:
                         displayAdminMenu();
                         break;
-                    case 1:
-                        System.out.println("\n--- Product List ---");
-                        printProductTable(products);
-                        break;
                     case 8:
                         System.out.print("Enter product name: ");
                         String prodName = scanner.nextLine();
@@ -186,13 +201,13 @@ public class Main {
                         break;
                     case 2:
                         int sortChoice = validateIntegerInput(scanner,
-                                "Filter by: 1. Name  2. Price\nEnter choice: ", 1, 2);
+                                "Sort by: 1. Name  2. Price\nEnter choice: ", 1, 2);
                         if (sortChoice == 1) {
                             products.sort(Comparator.comparing(Product::getName));
                         } else {
                             products.sort(Comparator.comparingDouble(Product::getPrice));
                         }
-                        System.out.println("Filtered list sorted.");
+                        System.out.println("Product list sorted.");
                         break;
                     case 3:
                         int addId = validateIntegerInput(scanner,
@@ -227,6 +242,19 @@ public class Main {
                     case 9:
                         checkoutQueue.add(customer);
                         System.out.println(customer.getName() + " added to checkout queue.");
+                        break;
+                    case 10:
+                        System.out.print("Enter product name to search: ");
+                        String searchName = scanner.nextLine();
+                        // Ensure list is sorted by name before binary search
+                        products.sort(Comparator.comparing(Product::getName));
+                        int index = manualBinarySearchByName(products, searchName);
+                        if (index != -1) {
+                            System.out.println("Product found:");
+                            System.out.println(products.get(index));
+                        } else {
+                            System.out.println("Product not found.");
+                        }
                         break;
                     default:
                         System.out.println("Invalid choice. (Enter 0 to see menu)");
