@@ -63,8 +63,8 @@ public class Main {
         System.out.println("0. Show Menu");
         System.out.println("1. View Products");
         System.out.println("8. Add Product");
-        System.out.println("10. Process Checkout Queue");
-        System.out.println("7. Exit");
+        System.out.println("11. Process Checkout Queue");
+        System.out.println("12. Exit");
     }
 
     private static void displayCustomerMenu() {
@@ -73,13 +73,13 @@ public class Main {
         System.out.println("1. View Products");
         System.out.println("2. Filter Products");
         System.out.println("3. Add to Cart");
-        System.out.println("4. View Cart");
-        System.out.println("5. Remove from Cart");
-        System.out.println("6. Checkout");
-        System.out.println("7. Exit");
+        System.out.println("4. Remove from Cart");
+        System.out.println("5. View Cart");
+        System.out.println("6. Search Product");
+        System.out.println("7. Wishlist");
         System.out.println("9. Enter Checkout Queue");
-        System.out.println("10. Search Product");
-        System.out.println("11. Wishlist");
+        System.out.println("10. Checkout");
+        System.out.println("12. Exit");
     }
 
     private static void displayWishlistMenu() {
@@ -139,9 +139,9 @@ public class Main {
         }
 
         // Role-based authentication
-        System.out.print("Are you an admin? (y/n): ");
+        System.out.print("Enter a for Admin login and c for Customer login ! (a/c): ");
         String roleInput = scanner.nextLine().trim().toLowerCase();
-        boolean isAdmin = roleInput.equals("y");
+        boolean isAdmin = roleInput.equals("a");
         boolean isCustomer = !isAdmin;
 
         String userName = "Admin";
@@ -211,7 +211,7 @@ public class Main {
                         ProductController.saveProducts(products); // Save products to file
                         System.out.println("Product added successfully!");
                         break;
-                    case 10:
+                    case 11:
                         if (checkoutQueue.isEmpty()) {
                             System.out.println("No customers in queue.");
                         } else {
@@ -221,7 +221,7 @@ public class Main {
                             nextCustomer.getCart().checkout();
                         }
                         break;
-                    case 7:
+                    case 12:
                         System.out.println("Goodbye, Admin!");
                         running = false;
                         break;
@@ -258,9 +258,6 @@ public class Main {
                         }
                         break;
                     case 4:
-                        customer.getCart().viewCart();
-                        break;
-                    case 5:
                         int removeId = validateIntegerInput(scanner, "Enter product ID to remove: ", 1,
                                 products.size());
                         Product removeProduct = findProductById(products, removeId);
@@ -270,24 +267,10 @@ public class Main {
                             System.out.println("Product ID not found.");
                         }
                         break;
-                    case 6:
+                    case 5:
                         customer.getCart().viewCart();
-                        int confirm = validateIntegerInput(scanner,
-                                "Confirm checkout? (1=Yes, 0=No): ", 0, 1);
-                        if (confirm == 1) {
-                            simulateProgressBar();
-                            customer.getCart().checkout();
-                        }
                         break;
-                    case 7:
-                        System.out.println("Goodbye, " + customer.getName() + "!");
-                        running = false;
-                        break;
-                    case 9:
-                        checkoutQueue.add(customer);
-                        System.out.println(customer.getName() + " added to checkout queue.");
-                        break;
-                    case 10:
+                    case 6:
                         System.out.print("Enter product name to search: ");
                         String searchName = scanner.nextLine();
                         // Ensure list is sorted by name before binary search
@@ -300,7 +283,7 @@ public class Main {
                             System.out.println("Product not found.");
                         }
                         break;
-                    case 11:
+                    case 7:
                         boolean wishlistRunning = true;
                         displayWishlistMenu();
                         while (wishlistRunning) {
@@ -336,6 +319,23 @@ public class Main {
                                     System.out.println("Invalid choice. Please try again.");
                             }
                         }
+                        break;
+                    case 9:
+                        checkoutQueue.add(customer);
+                        System.out.println(customer.getName() + " added to checkout queue.");
+                        break;
+                    case 10:
+                        customer.getCart().viewCart();
+                        int confirm = validateIntegerInput(scanner,
+                                "Confirm checkout? (1=Yes, 0=No): ", 0, 1);
+                        if (confirm == 1) {
+                            simulateProgressBar();
+                            customer.getCart().checkout();
+                        }
+                        break;
+                    case 12:
+                        System.out.println("Goodbye, " + customer.getName() + "!");
+                        running = false;
                         break;
 
                     default:
