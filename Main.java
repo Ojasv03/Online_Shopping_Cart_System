@@ -98,7 +98,34 @@ public class Main {
         }
         return null;
     }
+    private static void bubbleSortByName(List<Product> products) {
+        int n = products.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (products.get(j).getName().compareTo(products.get(j + 1).getName()) > 0) {
+                    // Swap products[j] and products[j + 1]
+                    Product temp = products.get(j);
+                    products.set(j, products.get(j + 1));
+                    products.set(j + 1, temp);
+                }
+            }
+        }
+    }
 
+    // Custom Bubble Sort implementation for sorting products by price
+    private static void bubbleSortByPrice(List<Product> products) {
+        int n = products.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (products.get(j).getPrice() > products.get(j + 1).getPrice()) {
+                    // Swap products[j] and products[j + 1]
+                    Product temp = products.get(j);
+                    products.set(j, products.get(j + 1));
+                    products.set(j + 1, temp);
+                }
+            }
+        }
+    }
     // Manual binary search implementation
     private static int binarySearchByName(List<Product> products, String targetName) {
         int low = 0;
@@ -123,7 +150,7 @@ public class Main {
         List<Product> products = ProductController.loadProducts(); // Loading products from file
         Queue<Customer> checkoutQueue = new LinkedList<>();
 
-        // If no products are loaded (file was empty or doesn't exist), preload some
+       
         // default products
         if (products.isEmpty()) {
             products.add(new Product(1, "Laptop", 99999.99, 10));
@@ -237,13 +264,13 @@ public class Main {
                         System.out.println("\n--- Product List ---");
                         printProductTable(products);
                         break;
-                    case 2:
+                        case 2:
                         int sortChoice = validateIntegerInput(scanner,
                                 "Filter by: 1. Name  2. Price\nEnter choice: ", 1, 2);
                         if (sortChoice == 1) {
-                            products.sort(Comparator.comparing(Product::getName));
+                            bubbleSortByName(products); // Use custom Bubble Sort for name
                         } else {
-                            products.sort(Comparator.comparingDouble(Product::getPrice));
+                            bubbleSortByPrice(products); // Use custom Bubble Sort for price
                         }
                         System.out.println("Product list filtered.");
                         break;
@@ -270,11 +297,10 @@ public class Main {
                     case 5:
                         customer.getCart().viewCart();
                         break;
-                    case 6:
+                        case 6:
                         System.out.print("Enter product name to search: ");
                         String searchName = scanner.nextLine();
-                        // Ensure list is sorted by name before binary search
-                        products.sort(Comparator.comparing(Product::getName));
+                        bubbleSortByName(products); 
                         int index = binarySearchByName(products, searchName);
                         if (index != -1) {
                             System.out.println("Product found:");

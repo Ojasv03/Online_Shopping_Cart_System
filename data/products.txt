@@ -9,3 +9,4 @@
 9,Pen Drive,499.99,50
 10,Bluetooth Speaker,3499.75,18
 11,Mouse,599.0,20
+12,Power Adaptee,699.0,10
