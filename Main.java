@@ -60,13 +60,13 @@ public class Main {
         Customer customer2 = new Customer("Bob");
         Customer customer3 = new Customer("Charlie");
     
-        customer1.getCart().addProduct(products.get(0), 2); 
-        customer1.getCart().addProduct(products.get(1), 1); 
-        customer2.getCart().addProduct(products.get(2), 3); 
-        customer2.getCart().addProduct(products.get(3), 2); 
-        customer3.getCart().addProduct(products.get(4), 1); 
-        customer3.getCart().addProduct(products.get(5), 1); 
-    
+        customer1.getCart().addProduct(products.get(0), 2, true); 
+        customer1.getCart().addProduct(products.get(1), 1, true); 
+        customer2.getCart().addProduct(products.get(2), 3, true); 
+        customer2.getCart().addProduct(products.get(3), 2, true); 
+        customer3.getCart().addProduct(products.get(4), 1, true); 
+        customer3.getCart().addProduct(products.get(5), 1, true); 
+
         checkoutQueue.add(customer1);
         checkoutQueue.add(customer2);
         checkoutQueue.add(customer3);
@@ -315,7 +315,7 @@ public class Main {
                         int quantity = validateIntegerInput(scanner, "Enter quantity: ", 1, 100);
                         Product selectedProduct = findProductById(products, addId);
                         if (selectedProduct != null) {
-                            customer.getCart().addProduct(selectedProduct, quantity);
+                            customer.getCart().addProduct(selectedProduct, quantity, false);
                         } else {
                             System.out.println("Product ID not found.");
                         }

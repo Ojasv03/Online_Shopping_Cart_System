@@ -6,14 +6,18 @@ import java.util.*;
 public class ShoppingCart {
     private Map<Product, Integer> cartItems = new HashMap<>();
 
-    public void addProduct(Product product, int quantity) {
+    public void addProduct(Product product, int quantity, boolean admin) {
         if (product.getStock() >= quantity) {
             cartItems.put(product, cartItems.getOrDefault(product, 0) + quantity);
             product.setStock(product.getStock() - quantity);
-            System.out.printf("%d x %s added to cart.%n", quantity, product.getName());
+            if (!admin) {
+                System.out.printf("%d x %s added to cart.%n", quantity, product.getName());
+            }
         } else {
-            System.out.printf("Error: Only %d units of %s available.%n", 
-                product.getStock(), product.getName());
+            if (!admin) {
+                System.out.printf("Error: Only %d units of %s available.%n", 
+                    product.getStock(), product.getName());
+            }
         }
     }
 
