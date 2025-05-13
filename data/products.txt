@@ -1,12 +1,13 @@
-1,Laptop,99999.99,10
-2,Phone,49949.0,15
-3,Headphones,7999.99,20
-4,Book,1299.0,30
-5,Tablet,29999.0,5
-6,Smartwatch,15999.5,8
+1,Laptop,99999.99,8
+2,Phone,49949.0,14
+3,Headphones,7999.99,17
+4,Book,1299.0,28
+5,Tablet,29999.0,4
+6,Smartwatch,15999.5,7
 7,Backpack,2499.99,12
 8,Charger,899.0,25
 9,Pen Drive,499.99,50
 10,Bluetooth Speaker,3499.75,18
 11,Mouse,599.0,20
 12,Power Adaptee,699.0,10
+13,Bag,900.0,10

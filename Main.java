@@ -93,10 +93,10 @@ public class Main {
         System.out.println("\n--- Admin Menu ---");
         System.out.println("0. Show Menu");
         System.out.println("1. View Products");
-        System.out.println("8. Add Product");
-        System.out.println("11. Process Checkout Queue");
-        System.out.println("13. View Checkout Queue");
-        System.out.println("12. Exit");
+        System.out.println("2. Add Product");
+        System.out.println("3. Process Checkout Queue");
+        System.out.println("4. View Checkout Queue");
+        System.out.println("5. Exit");
     }
 
     private static void displayCustomerMenu() {
@@ -109,9 +109,9 @@ public class Main {
         System.out.println("5. View Cart");
         System.out.println("6. Search Product");
         System.out.println("7. Wishlist");
-        System.out.println("9. Enter Checkout Queue");
-        System.out.println("10. Checkout");
-        System.out.println("12. Exit");
+        System.out.println("8. Enter Checkout Queue");
+        System.out.println("9. Checkout");
+        System.out.println("10. Exit");
     }
 
     private static void displayWishlistMenu() {
@@ -262,7 +262,7 @@ public class Main {
                         System.out.println("\n--- Product List ---");
                         printProductTable(products);
                         break;
-                    case 8:
+                    case 2:
                         System.out.print("Enter product name: ");
                         String prodName = scanner.nextLine();
                         double prodPrice = validatePriceInput(scanner);
@@ -271,7 +271,7 @@ public class Main {
                         ProductController.saveProducts(products); // Save products to file
                         System.out.println("Product added successfully!");
                         break;
-                    case 11:
+                    case 3:
                         if (checkoutQueue.isEmpty()) {
                             System.out.println("No customers in queue.");
                         } else {
@@ -281,10 +281,10 @@ public class Main {
                             nextCustomer.getCart().checkout();
                         }
                         break;
-                    case 13:
+                    case 4:
                         viewCheckoutQueue(checkoutQueue);
                         break;
-                    case 12:
+                    case 5:
                         System.out.println("Goodbye, Admin!");
                         running = false;
                         break;
@@ -382,11 +382,11 @@ public class Main {
                             }
                         }
                         break;
-                    case 9:
+                    case 8:
                         checkoutQueue.add(customer);
                         System.out.println(customer.getName() + " added to checkout queue.");
                         break;
-                    case 10:
+                    case 9:
                         customer.getCart().viewCart();
                         int confirm = validateIntegerInput(scanner,
                                 "Confirm checkout? (1=Yes, 0=No): ", 0, 1);
@@ -395,7 +395,7 @@ public class Main {
                             customer.getCart().checkout();
                         }
                         break;
-                    case 12:
+                    case 10:
                         System.out.println("Goodbye, " + customer.getName() + "!");
                         running = false;
                         break;
