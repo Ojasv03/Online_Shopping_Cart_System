@@ -41,6 +41,37 @@ public class Main {
             }
         }
     }
+    private static void viewCheckoutQueue(Queue<Customer> checkoutQueue) {
+        if (checkoutQueue.isEmpty()) {
+            System.out.println("The checkout queue is empty.");
+            return;
+        }
+    
+        System.out.println("\n--- Checkout Queue ---");
+        int position = 1;
+        for (Customer customer : checkoutQueue) {
+            System.out.println(position + ". " + customer.getName() + "'s Cart:");
+            customer.getCart().viewCart();
+            position++;
+        }
+    }
+    private static void addSampleEntriesToQueue(Queue<Customer> checkoutQueue, List<Product> products) {
+        Customer customer1 = new Customer("Alice");
+        Customer customer2 = new Customer("Bob");
+        Customer customer3 = new Customer("Charlie");
+    
+        customer1.getCart().addProduct(products.get(0), 2); 
+        customer1.getCart().addProduct(products.get(1), 1); 
+        customer2.getCart().addProduct(products.get(2), 3); 
+        customer2.getCart().addProduct(products.get(3), 2); 
+        customer3.getCart().addProduct(products.get(4), 1); 
+        customer3.getCart().addProduct(products.get(5), 1); 
+    
+        checkoutQueue.add(customer1);
+        checkoutQueue.add(customer2);
+        checkoutQueue.add(customer3);
+    
+    }
 
     private static double validatePriceInput(Scanner scanner) {
         while (true) {
@@ -64,6 +95,7 @@ public class Main {
         System.out.println("1. View Products");
         System.out.println("8. Add Product");
         System.out.println("11. Process Checkout Queue");
+        System.out.println("13. View Checkout Queue");
         System.out.println("12. Exit");
     }
 
@@ -200,6 +232,7 @@ public class Main {
             customer.greet();
         } else {
             System.out.println("Welcome, Admin!");
+            addSampleEntriesToQueue(checkoutQueue, products); 
         }
 
         // Display menu ONCE before loop
@@ -247,6 +280,9 @@ public class Main {
                             simulateProgressBar();
                             nextCustomer.getCart().checkout();
                         }
+                        break;
+                    case 13:
+                        viewCheckoutQueue(checkoutQueue);
                         break;
                     case 12:
                         System.out.println("Goodbye, Admin!");
